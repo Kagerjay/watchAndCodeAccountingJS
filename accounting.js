@@ -17,7 +17,7 @@
 	var lib = {};
 
 	// Current version
-	lib.version = '0.4.2';
+	lib.version = '0.4.1';
 
 
 	/* --- Exposed settings --- */
@@ -58,7 +58,7 @@
 	}
 
 	/**
-	 * Tests whether supplied parameter is an array
+	 * Tests whether supplied parameter is a string
 	 * from underscore.js, delegates to ECMA5's native Array.isArray
 	 */
 	function isArray(obj) {
@@ -197,7 +197,7 @@
 		var regex = new RegExp("[^0-9-" + decimal + "]", ["g"]),
 			unformatted = parseFloat(
 				("" + value)
-				.replace(/\((?=\d+)(.*)\)/, "-$1") // replace bracketed values with negatives
+				.replace(/\((.*)\)/, "-$1") // replace bracketed values with negatives
 				.replace(regex, '')         // strip out any cruft
 				.replace(decimal, '.')      // make sure decimal point is standard
 			);
@@ -215,11 +215,10 @@
 	 */
 	var toFixed = lib.toFixed = function(value, precision) {
 		precision = checkPrecision(precision, lib.settings.number.precision);
+		var power = Math.pow(10, precision);
 
-		var exponentialForm = Number(lib.unformat(value) + 'e' + precision);
-		var rounded = Math.round(exponentialForm);
-		var finalResult = Number(rounded + 'e-' + precision).toFixed(precision);
-		return finalResult;
+		// Multiply up by precision, round accurately, then divide and use native toFixed():
+		return (Math.round(lib.unformat(value) * power) / power).toFixed(precision);
 	};
 
 
@@ -322,7 +321,7 @@
 	 * browsers from collapsing the whitespace in the output strings.
 	 */
 	lib.formatColumn = function(list, symbol, precision, thousand, decimal, format) {
-		if (!list || !isArray(list)) return [];
+		if (!list) return [];
 
 		// Build options object from second param (if object) or all params, extending defaults:
 		var opts = defaults(
