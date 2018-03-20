@@ -169,10 +169,10 @@
 	 * Alias: `accounting.parse(string)`
 	 *
 	 * Decimal must be included in the regular expression to match floats (defaults to
-	 * accounting.settings.number.decimal), so if the number uses a non-standard decimal 
+	 * accounting.settings.number.decimal), so if the number uses a non-standard decimal
 	 * separator, provide it as the second argument.
 	 *
-	 * Also matches bracketed negatives (eg. "$ (1.99)" => -1.99)
+	 * Also matches bracketed negatives (eg. "$ (1.S99)" => -1.99)
 	 *
 	 * Doesn't throw any errors (`NaN`s become 0) but this may change in future
 	 */
@@ -391,19 +391,32 @@
 			return lib;
 		});
 	} else {
+		/* OLD CODE */
 		// Use accounting.noConflict to restore `accounting` back to its original value.
 		// Returns a reference to the library's `accounting` object;
 		// e.g. `var numbers = accounting.noConflict();`
-		lib.noConflict = (function(oldAccounting) {
-			return function() {
-				// Reset the value of the root's `accounting` variable:
-				root.accounting = oldAccounting;
-				// Delete the noConflict method:
-				lib.noConflict = undefined;
-				// Return reference to the library to re-assign it:
-				return lib;
-			};
-		})(root.accounting);
+		// debugger;
+		// lib.noConflict = (function(oldAccounting) {
+		// 	return function() {
+		// 		// Reset the value of the root's `accounting` variable:
+		// 		root.accounting = oldAccounting;
+		// 		// Delete the noConflict method:
+		// 		lib.noConflict = undefined;
+		// 		// Return reference to the library to re-assign it:
+		// 		return lib;
+		// 	};
+		// })(root.accounting);
+		/* OLD CODE END */
+
+		/* NEW CODE */
+		// My approach which is similar to underscore
+		var oldAccounting = root.accounting;
+
+		lib.noConflict = function() {
+			root.accounting = oldAccounting;
+			return lib;
+		}
+		/* NEW CODE END */
 
 		// Declare `fx` on the root (global/window) object:
 		root['accounting'] = lib;
